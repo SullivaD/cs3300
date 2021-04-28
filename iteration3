@@ -1,0 +1,55 @@
+# Daniel Sullivan
+# 4/23/21
+# CS 3300 003
+# Iteration 3
+#
+# This iteration allows the user to add, edit, and remove a project
+# from the portfolio. It also creates a table that organizes all the
+# projects into the portfolio, showing the title and description.
+
+
+Class CreatePortfolio < PortfolioController::Migration
+    def change
+        create_table ‘projects’, :force => true do |t|
+            t.string :title
+            t.text :description
+            t.datetime :date_created
+            # Add fields that let Rails automatically keep track
+            # of when projects are added, edited, or deleted:
+            t.timestamps
+        end
+    end
+end
+
+# allows the user to add a project to the portfolio:
+def add
+    @project = Project.new(params[:project])
+    if @project.save
+        flash[:notice] = “#{@project.title} was successfully created.”
+        redirect_to_projects_path
+    else
+        render ‘new’ # note, ‘new’ template can access @project’s field values!
+    end
+end
+
+# allows the user to edit a project in the portfolio:
+def edit
+    @project = Project.find params[:id]
+    if @project.edit_attributes(params[:project])
+        flash[:notice] = “#{@project.title} was successfully updated.”
+        redirect_to_project_path(@project)
+    else
+        render ‘edit’ # note, ‘edit’ template can access @project’s field values!
+    end
+end
+
+# allows the user to delete a project in the portfolio:
+def delete
+    @project = Project.find params[:id]
+    if @project.delete_attributes(params[:project])
+        flash[:notice] = “#{@project.title} was successfully deleted.”
+        redirect_to_project_path(@project)
+    else
+        render ‘delete’ # note, ‘delete’ template can access @project’s field values!
+    end
+end
